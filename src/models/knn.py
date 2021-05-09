@@ -1,11 +1,6 @@
 import argparse
-
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-
 from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 # Unsupervised version of KNN
@@ -33,10 +28,10 @@ class KNNModel:
 
         # Calculate the value for percentile p
         p = self.threshold
-        percentile = np.percentile(distances_mean, 1 - p)
+        threshold_value = np.percentile(distances_mean, 100 - p)
         
-        outlier_true = self.validation_df['label'].values               # Get true (actual) values
-        outlier_pred = np.where(distances_mean > percentile, 'A', 'N')  # Get predicted values
+        outlier_true = self.validation_df['label'].values               # Get true (actual) labels
+        outlier_pred = np.where(distances_mean > threshold_value, 'A', 'N')  # Get predicted labels
 
         # Calcuate TPR/FPR using a confusion matrix
         true_negatives, false_positives, false_negatives, true_positives = confusion_matrix(outlier_true, outlier_pred, labels=['N', 'A']).ravel()
