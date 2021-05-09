@@ -11,7 +11,7 @@ def get_args():
     parser.add_argument('-i', dest='input', required=True)
     parser.add_argument('-p', dest='pre_processor', required=True, choices=['frequency_vector', 'sliding_window', 'n_gram'])
     parser.add_argument('-m', dest='model', required=True, choices=['knn'])
-    parser.add_argument('--folds', dest='folds', type=int, required=True)
+    parser.add_argument('--folds', default=10, dest='folds', type=int)
     args = parser.parse_known_args()
 
     # Append preprocessor-specific args 
