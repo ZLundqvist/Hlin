@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 # Unsupervised version of KNN
 class KNNModel:
@@ -15,10 +16,10 @@ class KNNModel:
         self.folds = args.folds
 
         self.validation_df = data_set[['label', 'timestamp']]
-        self.data_df = data_set.drop(['label', 'timestamp'], axis=1)
+        self.df = data_set.drop(['label', 'timestamp'], axis=1)
 
     def train_validate(self): 
-        df = self.data_df
+        df = self.df
         X = df.values
 
         nbrs = NearestNeighbors(n_neighbors=self.k)
@@ -30,29 +31,22 @@ class KNNModel:
         # Calculate the mean distance for each value
         distances_mean = distances.mean(axis = 1)
 
+        # Calculate the value for percentile p
         p = self.threshold
         percentile = np.percentile(distances_mean, p)
+        
+        outlier_true = self.validation_df['label'].values               # Get true (actual) values
+        outlier_pred = np.where(distances_mean > percentile, 'A', 'N')  # Get predicted values
 
-        # Get all indicies that are considered anomalous
-        outlier_indices = np.where(distances_mean > percentile)
+        # Calcuate TPR/FPR using a confusion matrix
+        true_negatives, false_positives, false_negatives, true_positives = confusion_matrix(outlier_true, outlier_pred, labels=['N', 'A']).ravel()
+        true_positive_rate = true_positives / (true_positives + false_negatives)
+        false_positive_rate = false_positives / (false_positives + true_negatives)
 
-        # Get the validation data frame 
-        outlier_df = self.validation_df.iloc[outlier_indices[0],:]
-        not_outlier_df = self.validation_df.drop(outlier_df.index, axis=0)
+        # Calculate accuracy
+        accuracy = accuracy_score(outlier_true, outlier_pred, normalize=True)
 
-        # Confusion matrix
-        positives = np.where(self.validation_df['label'] == 'A')[0]
-        negatives = np.where(self.validation_df['label'] == 'N')[0]
-
-        true_positives = outlier_df.loc[outlier_df['label'] == 'A'].index
-        false_positives = outlier_df.loc[outlier_df['label'] == 'N'].index
-
-        true_negatives = not_outlier_df.loc[not_outlier_df['label'] == 'N'].index
-        false_negatives = not_outlier_df.loc[not_outlier_df['label'] == 'A'].index
-
-        true_positive_rate = len(true_positives) / (len(true_positives) + len(false_negatives))
-        false_positive_rate = len(false_positives) / (len(false_positives) + len(true_negatives))
-
+        print(f'ACC: {round(accuracy*100, 2)}%')
         print(f'TPR: {round(true_positive_rate*100, 2)}%')
         print(f'FPR: {round(false_positive_rate*100, 2)}%')
 
