@@ -3,9 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def frequency_vector_knn(bags: list):
-    print(f'[+] Transforming {len(bags)} bags for KNN')
-
+def frequency_vector_to_df(bags: list):
     # Prepare data for convertion to a Dataframe
     copied_bags = []
     for bag in bags:
@@ -26,6 +24,31 @@ def frequency_vector_knn(bags: list):
     df_no_dups = df.drop_duplicates(subset=columns, ignore_index=True)
     duplicates_dropped = len(df) - len(df_no_dups)
 
-    print(f'[+] DataFrame created (rows={len(df_no_dups.index)}, columns={len(df_no_dups.columns)}, duplicates_dropped={duplicates_dropped})')
+    return df_no_dups, duplicates_dropped
+    
 
-    return df_no_dups
+def frequency_vector_knn(bags: list):
+    print(f'[+] Transforming {len(bags)} frequency vector bags for KNN')
+
+    df, duplicates_dropped = frequency_vector_to_df(bags)
+
+    print(f'[+] DataFrame created (rows={len(df.index)}, columns={len(df.columns)}, duplicates_dropped={duplicates_dropped})')
+
+    return df
+
+def frequency_vector_isolation_forest(bags: list):
+    print(f'[+] Transforming {len(bags)} frequency vector bags for Isolation Forest')
+
+    df, duplicates_dropped = frequency_vector_to_df(bags)
+
+    # Isolation Forest expects a contamination values
+    # "The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the scores of the samples."
+    # We actually know that as we have a labelled dataset, so calculate
+    contamination = df['label'].value_counts(normalize=True)['A']
+
+    print(f'[+] Contamination: {round(contamination* 100, 2)}%')
+    print(f'[+] DataFrame created (rows={len(df.index)}, columns={len(df.columns)}, duplicates_dropped={duplicates_dropped})')
+    return {
+        'df': df,
+        'contamination': contamination
+    }

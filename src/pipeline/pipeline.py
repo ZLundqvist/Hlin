@@ -2,8 +2,9 @@ import time
 
 from pre_processors.frequency_vector import FrequencyVectorPreProcessor
 from models.knn import KNNModel
+from models.isolation_forest import IsolationForestModel
 from util.args import pretty_print_args
-from util.data_transformers import frequency_vector_knn
+from util.data_transformers import frequency_vector_knn, frequency_vector_isolation_forest
 
 class Pipeline:
     def __init__(self, args):
@@ -17,6 +18,9 @@ class Pipeline:
             if self.args.model == 'knn':
                 self.data_transformer = frequency_vector_knn
                 self.model_class = KNNModel
+            elif self.args.model == 'isolation_forest':
+                self.data_transformer = frequency_vector_isolation_forest
+                self.model_class = IsolationForestModel
 
     def execute(self):
         print('\n---------- Pre-processing ----------')
