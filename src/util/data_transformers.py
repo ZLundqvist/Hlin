@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def frequency_vector_to_df(bags: list):
+def bags_to_dataframe(bags: list):
     # Prepare data for convertion to a Dataframe
     copied_bags = []
     for bag in bags:
@@ -30,7 +30,7 @@ def frequency_vector_to_df(bags: list):
 def frequency_vector_knn(bags: list):
     print(f'[+] Transforming {len(bags)} frequency vector bags for KNN')
 
-    df, duplicates_dropped = frequency_vector_to_df(bags)
+    df, duplicates_dropped = bags_to_dataframe(bags)
 
     print(f'[+] DataFrame created (rows={len(df.index)}, columns={len(df.columns)}, duplicates_dropped={duplicates_dropped})')
 
@@ -39,7 +39,33 @@ def frequency_vector_knn(bags: list):
 def frequency_vector_isolation_forest(bags: list):
     print(f'[+] Transforming {len(bags)} frequency vector bags for Isolation Forest')
 
-    df, duplicates_dropped = frequency_vector_to_df(bags)
+    df, duplicates_dropped = bags_to_dataframe(bags)
+
+    # Isolation Forest expects a contamination values
+    # "The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the scores of the samples."
+    # We actually know that as we have a labelled dataset, so calculate
+    contamination = df['label'].value_counts(normalize=True)['A']
+
+    print(f'[+] Contamination: {round(contamination* 100, 2)}%')
+    print(f'[+] DataFrame created (rows={len(df.index)}, columns={len(df.columns)}, duplicates_dropped={duplicates_dropped})')
+    return {
+        'df': df,
+        'contamination': contamination
+    }
+
+def sliding_window_knn(bags: list):
+    print(f'[+] Transforming {len(bags)} sliding window bags for KNN')
+
+    df, duplicates_dropped = bags_to_dataframe(bags)
+
+    print(f'[+] DataFrame created (rows={len(df.index)}, columns={len(df.columns)}, duplicates_dropped={duplicates_dropped})')
+
+    return df
+
+def sliding_window_isolation_forest(bags: list):
+    print(f'[+] Transforming {len(bags)} sliding window bags for Isolation Forest')
+
+    df, duplicates_dropped = bags_to_dataframe(bags)
 
     # Isolation Forest expects a contamination values
     # "The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the scores of the samples."

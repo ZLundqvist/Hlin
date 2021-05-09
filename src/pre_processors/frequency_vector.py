@@ -2,7 +2,7 @@ import argparse
 import os
 
 from util.filesystem import ensure_file, write_cache_json, read_cache_json
-from util.pre_processing import read_log_file, get_unique_calls, get_system_call_index_map
+from util.pre_processing import read_log_file, get_unique_calls
 
 class FrequencyVectorPreProcessor:
     
@@ -27,8 +27,6 @@ class FrequencyVectorPreProcessor:
 
         unique_calls = get_unique_calls(system_calls)
         print(f'[+] Unique calls: {len(unique_calls)}')
-
-        system_call_index_map = get_system_call_index_map(unique_calls)
 
         frequency_vectors = self.create_frequency_vectors(system_calls=system_calls)
 
@@ -84,29 +82,12 @@ class FrequencyVectorPreProcessor:
                 system_call_name = system_call['name']
                 bag[system_call_name] = bag[system_call_name] + 1
 
-                # system_call_index = index_map[system_call['name']]
-                # assert type(system_call_index) == int
-                # assert type(vector[system_call_index]) == int
-                # vector[system_call_index] = vector[system_call_index] + 1
-
 
             bags.append({
                 'label': label,
                 'timestamp': frequency_vector['timestamp'],
                 'bag': bag
             })
-
-        # Remove dup bags
-        # unique_bags = []
-        # bag_vector_set = set()
-        # for bag in bags:
-        #     vector_tuple = tuple(bag['vector'])
-
-        #     if vector_tuple in bag_vector_set:
-        #         duplicate_bags = duplicate_bags + 1
-        #     else:
-        #         unique_bags.append(bag)
-        #         bag_vector_set.add(vector_tuple)
 
         return bags
 

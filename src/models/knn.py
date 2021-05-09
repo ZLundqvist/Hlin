@@ -8,7 +8,6 @@ class KNNModel:
     def __init__(self, args, data_set):
         self.k = args.k_neighbours
         self.threshold = args.anomaly_threshold
-        self.folds = args.folds
 
         self.validation_df = data_set[['label', 'timestamp']]
         self.df = data_set.drop(['label', 'timestamp'], axis=1)
