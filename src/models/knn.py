@@ -33,7 +33,7 @@ class KNNModel:
 
         # Calculate the value for percentile p
         p = self.threshold
-        percentile = np.percentile(distances_mean, p)
+        percentile = np.percentile(distances_mean, 1 - p)
         
         outlier_true = self.validation_df['label'].values               # Get true (actual) values
         outlier_pred = np.where(distances_mean > percentile, 'A', 'N')  # Get predicted values
