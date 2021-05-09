@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Bags = list of dict's as outputted by sliding_window and frequency_vector preprocessors
 def bags_to_dataframe(bags: list):
     # Prepare data for convertion to a Dataframe
     copied_bags = []
@@ -23,6 +24,11 @@ def bags_to_dataframe(bags: list):
     # Drop dupliactes based on above columns
     df_no_dups = df.drop_duplicates(subset=columns, ignore_index=True)
     duplicates_dropped = len(df) - len(df_no_dups)
+
+    # Check that data contains anomalous values as well (sanity check more or less)
+    # if not 'A' in df_no_dups['']
+    if not 'A' in df_no_dups['label'].values:
+        raise Exception('Data contains no anomalous values, this is not supported')
 
     return df_no_dups, duplicates_dropped
     

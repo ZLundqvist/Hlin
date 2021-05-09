@@ -19,8 +19,7 @@ class FrequencyVectorPreProcessor:
             return cached_bags
 
         if not ensure_file(self.input):
-            raise Exception('Input file does not exist')
-
+            raise Exception(f'Input file does not exist: {self.input}')
 
         system_calls = read_log_file(self.input)
         print(f'[+] System calls: {len(system_calls)}')
