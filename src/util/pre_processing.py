@@ -34,11 +34,13 @@ def line_to_system_call(line: str) -> dict:
         'name': parts[2]
     }
 
-def get_unique_calls(system_calls: list) -> set: 
-    system_call_name_set = set()
+def get_unique_calls(system_calls: list) -> list: 
+    system_call_name_set = list()
 
     for system_call in system_calls:
-        system_call_name_set.add(system_call['name'])
+        if system_call['name'] not in system_call_name_set:
+            system_call_name_set.append(system_call['name'])            
+        # system_call_name_set.add(system_call['name'])
 
     return system_call_name_set
 

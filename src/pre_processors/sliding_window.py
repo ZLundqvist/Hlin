@@ -35,7 +35,7 @@ class SlidingWindowPreProcessor:
 
         return bags
 
-    def create_bags(self, system_calls: list, unique_calls: set):
+    def create_bags(self, system_calls: list, unique_calls: list):
         bags = []
 
         for index in range(0, len(system_calls), self.window_step_size):
