@@ -6,12 +6,12 @@ from util.pre_processing import read_log_file, get_unique_calls
 
 class SlidingWindowPreProcessor:
     
-    def __init__(self, args):
-        self.input = args.input
+    def __init__(self, input_file: str, args):
+        self.input = input_file
         self.input_filename = os.path.basename(self.input).split('.')[0] # Get file name without extension
         self.window_size = args.window_size
         self.window_step_size = args.window_step_size
-        self.id = f'sliding_window_{self.window_size}_{self.window_step_size}_{self.input_filename}'
+        self.id = f'{self.get_static_id(args)}_{self.input_filename}'
 
     def pre_process(self):
         cached_bags = read_cache_json(self.id)
@@ -60,8 +60,13 @@ class SlidingWindowPreProcessor:
 
         return bags
 
+    # Returns the static portion of the pre-processor id (filename not included)
+    @staticmethod
+    def get_static_id(args):
+        return f'sliding_window_{args.window_size}_{args.window_step_size}'
+
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
-        argparser.add_argument('--window-size', dest='window_size', type=int, required=True)
-        argparser.add_argument('--window-step-size', dest='window_step_size', type=int, required=True)
+        argparser.add_argument('--window-size', dest='window_size', type=int, default=11)
+        argparser.add_argument('--window-step-size', dest='window_step_size', type=int, default=6)
 

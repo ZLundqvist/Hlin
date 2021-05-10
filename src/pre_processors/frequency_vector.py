@@ -5,12 +5,12 @@ from util.filesystem import ensure_file, write_cache_json, read_cache_json
 from util.pre_processing import read_log_file, get_unique_calls
 
 class FrequencyVectorPreProcessor:
-    
-    def __init__(self, args):
-        self.input = args.input
-        self.delta_t = args.delta_t / 1000 # convert to ms
+    def __init__(self, input_file: str, args):
+        self.input = input_file
         self.input_filename = os.path.basename(self.input).split('.')[0] # Get file name without extension
-        self.id = f'frequency_vector_{self.delta_t}_{self.input_filename}'
+        self.delta_t = args.delta_t / 1000 # convert to ms
+        
+        self.id = f'{self.get_static_id(args)}_{self.input_filename}'
 
     def pre_process(self):
         cached_bags = read_cache_json(self.id)
@@ -89,8 +89,13 @@ class FrequencyVectorPreProcessor:
             })
 
         return bags
+    
+    # Returns the static portion of the pre-processor id (filename not included)
+    @staticmethod
+    def get_static_id(args):
+        return f'frequency_vector_{args.delta_t}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
-        argparser.add_argument('--delta-t', dest='delta_t', help="delta_t in milliseconds", type=int, required=True)
+        argparser.add_argument('--delta-t', dest='delta_t', help="delta_t in milliseconds", default=100, type=int)
 

@@ -9,9 +9,12 @@ from .filesystem import resolve_abs_path
 
 def get_args():
     parser = argparse.ArgumentParser(description='Hlin')
-    parser.add_argument('-i', dest='input', required=True)
     parser.add_argument('-p', dest='pre_processor', required=True, choices=['frequency_vector', 'sliding_window', 'n_gram'])
     parser.add_argument('-m', dest='model', required=True, choices=['knn', 'isolation_forest'])
+
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument('-i', dest='input')
+    input_group.add_argument('--input-dir', dest='input_dir')
     args = parser.parse_known_args()
 
     # Append preprocessor-specific args 
@@ -32,10 +35,6 @@ def get_args():
 
     # Re-parse
     args = parser.parse_args()
-
-    # Convert input to absolute path
-    args.input = resolve_abs_path(args.input)
-
     return args
 
 def pretty_print_args(args):
@@ -43,5 +42,6 @@ def pretty_print_args(args):
 
     print('------------ Settings ------------')
     for name, value in kwargs:
-        print(f'{(name + ":"):<{20}}{value}')
+        if value:
+            print(f'{(name + ":"):<{20}}{value}')
 

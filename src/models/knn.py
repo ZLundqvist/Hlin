@@ -3,11 +3,14 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import confusion_matrix, accuracy_score
 
+from util.eval_result import EvalResult
+
 # Unsupervised version of KNN
 class KNNModel:
-    def __init__(self, args, data_set):
+    def __init__(self, args, input_file: str, data_set):
         self.k = args.k_neighbours
         self.threshold = args.anomaly_threshold
+        self.input_file = input_file
 
         self.validation_df = data_set[['label', 'timestamp']]
         self.df = data_set.drop(['label', 'timestamp'], axis=1)
@@ -25,28 +28,25 @@ class KNNModel:
         # Calculate the mean distance for each value
         distances_mean = distances.mean(axis = 1)
 
-        # Calculate the value for percentile p
+        # Calculate the value for top percentile p
         p = self.threshold
         threshold_value = np.percentile(distances_mean, 100 - p)
         
         outlier_true = self.validation_df['label'].values               # Get true (actual) labels
         outlier_pred = np.where(distances_mean > threshold_value, 'A', 'N')  # Get predicted labels
 
-        # Calcuate TPR/FPR using a confusion matrix
-        true_negatives, false_positives, false_negatives, true_positives = confusion_matrix(outlier_true, outlier_pred, labels=['N', 'A']).ravel()
-        true_positive_rate = true_positives / (true_positives + false_negatives)
-        false_positive_rate = false_positives / (false_positives + true_negatives)
+        eval_results = EvalResult(input_file=self.input_file, true_y=outlier_true, pred_y=outlier_pred)
+        eval_results.pretty_print()
+        return eval_results
 
-        # Calculate accuracy
-        accuracy = accuracy_score(outlier_true, outlier_pred, normalize=True)
-
-        print(f'ACC: {round(accuracy*100, 2)}%')
-        print(f'TPR: {round(true_positive_rate*100, 2)}%')
-        print(f'FPR: {round(false_positive_rate*100, 2)}%')
+    # Returns the static portion of the model id (filename not included)
+    @staticmethod
+    def get_static_id(args):
+        return f'knn_{args.k_neighbours}_{args.anomaly_threshold}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
-        argparser.add_argument('--k-neighbours', dest='k_neighbours', type=int, required=True)
-        argparser.add_argument('--anomaly-threshold', dest='anomaly_threshold', type=float, required=True)
+        argparser.add_argument('--k-neighbours', dest='k_neighbours', type=int, default=5)
+        argparser.add_argument('--anomaly-threshold', dest='anomaly_threshold', type=int, default=10)
 
 
