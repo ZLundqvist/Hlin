@@ -16,14 +16,16 @@ class IsolationForestModel:
         self.input_file = input_file
 
         df = data_set['df']
+        self.df_norm = df[df['label'] == 'N']
         self.validation_df = df[['label', 'timestamp']]
         self.df = df.drop(['label', 'timestamp'], axis=1)
 
     def train_validate(self): 
         df = self.df
         X = df.values
+        X_norm = self.df_norm.drop(['label', 'timestamp'], axis=1).values
 
-        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0).fit(X)
+        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0).fit(X_norm)
 
         outlier_pred = isolation_forest.predict(X)
 
@@ -37,7 +39,7 @@ class IsolationForestModel:
     # Returns the static portion of the model id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'knn_{args.n_estimators}'
+        return f'iForest_{args.n_estimators}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
