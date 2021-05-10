@@ -29,7 +29,7 @@ class FrequencyVectorPreProcessor:
 
         frequency_vectors = self.create_frequency_vectors(system_calls=system_calls)
 
-        bags = self.create_bags(frequency_vectors=frequency_vectors, index_map=system_call_index_map, unique_calls=unique_calls)
+        bags = self.create_bags(frequency_vectors=frequency_vectors, unique_calls=unique_calls)
         print(f'[+] Bags: {len(bags)}')
 
         write_cache_json(self.id, bags)
@@ -63,7 +63,7 @@ class FrequencyVectorPreProcessor:
 
         return frequency_vectors
 
-    def create_bags(self, frequency_vectors: list, index_map: dict, unique_calls: list) -> list:
+    def create_bags(self, frequency_vectors: list, unique_calls: list) -> list:
         bags = []
 
         for frequency_vector in frequency_vectors:
