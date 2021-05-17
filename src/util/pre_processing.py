@@ -32,7 +32,7 @@ def drop_duplicates(df: pd.DataFrame, mode: str):
         df.drop_duplicates(subset=columns, ignore_index=True, inplace=True)
         duplicates_dropped = original_len - len(df)
         return df, duplicates_dropped
-    elif mode == 'all':
+    elif mode == 'first':
         columns.remove('label')
         columns.remove('timestamp')
         df.drop_duplicates(subset=columns, ignore_index=True, inplace=True)
@@ -79,24 +79,3 @@ def line_to_system_call(line: str) -> dict:
         'timestamp': Decimal(parts[1]),
         'name': parts[2]
     }
-
-def get_unique_calls(system_calls: list) -> list: 
-    system_call_name_set = list()
-
-    for system_call in system_calls:
-        if system_call['name'] not in system_call_name_set:
-            system_call_name_set.append(system_call['name'])            
-        # system_call_name_set.add(system_call['name'])
-
-    return system_call_name_set
-
-# Maps a set of unique system calls to indexes
-def get_system_call_index_map(unique_calls: set) -> dict:
-    unique_calls_list = list(unique_calls)
-    sorted_unique_calls_list = sorted(unique_calls_list)
-
-    mapping = dict()
-    for i in range(0, len(sorted_unique_calls_list)):
-        mapping[sorted_unique_calls_list[i]] = i
-
-    return mapping
