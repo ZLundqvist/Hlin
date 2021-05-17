@@ -24,8 +24,10 @@ class IsolationForestModel:
         df = self.df
         X = df.values
         X_norm = self.df_norm.drop(['label', 'timestamp'], axis=1).values
-
-        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0).fit(X_norm)
+        # if self.contamination < 0.05:
+        #     self.contamination = 0.05
+        # isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0).fit(X_norm)
+        isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0).fit(X_norm)
 
         outlier_pred = isolation_forest.predict(X)
 

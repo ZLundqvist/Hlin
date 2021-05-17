@@ -2,11 +2,12 @@ import time
 
 from pre_processors.frequency_vector import FrequencyVectorPreProcessor
 from pre_processors.sliding_window import SlidingWindowPreProcessor
+from pre_processors.n_gram import NGramPreProcessor
 from models.knn import KNNModel
 from models.isolation_forest import IsolationForestModel
 from util.args import pretty_print_args
 from util.filesystem import get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
-from util.data_transformers import frequency_vector_knn, frequency_vector_isolation_forest, sliding_window_knn, sliding_window_isolation_forest
+from util.data_transformers import frequency_vector_knn, frequency_vector_isolation_forest, sliding_window_knn, sliding_window_isolation_forest, n_gram_knn, n_gram_isolation_forest
 
 class Pipeline:
     def __init__(self, args):
@@ -33,6 +34,16 @@ class Pipeline:
                 self.model_class = KNNModel
             elif self.args.model == 'isolation_forest':
                 self.data_transformer = sliding_window_isolation_forest
+                self.model_class = IsolationForestModel
+
+        elif self.args.pre_processor == 'n_gram':
+            self.pre_processor_class = NGramPreProcessor
+
+            if self.args.model == 'knn':
+                self.data_transformer = n_gram_knn
+                self.model_class = KNNModel
+            elif self.args.model == 'isolation_forest':
+                self.data_transformer = n_gram_isolation_forest
                 self.model_class = IsolationForestModel
 
         # The run id is unique per combination of pp and model (including their args)
