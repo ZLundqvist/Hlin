@@ -2,40 +2,34 @@ import argparse
 import os
 import pandas as pd
 
-from util.filesystem import ensure_file, write_cache_json, read_cache_json
-from util.pre_processing import read_log_file, get_unique_calls, get_calls_metadata
+from util.filesystem import ensure_file, read_cache_pickle, write_cache_pickle
+from util.pre_processing import get_calls_metadata, drop_duplicates, system_calls_iterator
 
 class FrequencyVectorPreProcessor:
     def __init__(self, input_file: str, args):
         self.input = input_file
         self.input_filename = os.path.basename(self.input).split('.')[0] # Get file name without extension
         self.delta_t = args.delta_t / 1000 # convert to ms
+        self.drop_duplicates_mode = args.drop_duplicates_mode
         
         self.id = f'{self.get_static_id(args)}_{self.input_filename}'
 
     def pre_process(self):
-        cached_bags = read_cache_json(self.id)
-        if cached_bags:
-            print(f'[+] Bags: {len(cached_bags)}')
-            return cached_bags
+        cached_df = read_cache_pickle(self.id)
+        if cached_df is not None:
+            print(f'[+] Bags: {len(cached_df.index)}')
+            return cached_df
 
         if not ensure_file(self.input):
             raise Exception(f'Input file does not exist: {self.input}')
 
-        system_calls = read_log_file(self.input)
-        print(f'[+] System calls: {len(system_calls)}')
+        df = self.create_dataframe()
+        df, duplicates_dropped = drop_duplicates(df=df, mode=self.drop_duplicates_mode)
+        print(f'[+] DataFrame created (rows={len(df)}, duplicates_dropped={duplicates_dropped})')
 
-        unique_calls = get_unique_calls(system_calls)
-        print(f'[+] Unique calls: {len(unique_calls)}')
+        write_cache_pickle(self.id, df=df)
 
-        frequency_vectors = self.create_frequency_vectors(system_calls=system_calls)
-
-        bags = self.create_bags(frequency_vectors=frequency_vectors, unique_calls=unique_calls)
-        print(f'[+] Bags: {len(bags)}')
-
-        write_cache_json(self.id, bags)
-
-        return bags
+        return df
 
     def create_dataframe(self) -> pd.DataFrame:
         num_calls, unique_calls = get_calls_metadata(self.input)
@@ -43,11 +37,74 @@ class FrequencyVectorPreProcessor:
         print(f'[+] System calls: {num_calls}')
         print(f'[+] Unique calls: {len(unique_calls)}')
 
+        bags = self.create_bags(unique_syscalls=unique_calls)
 
-        return None
+        print(f'[+] Bags: {len(bags)}')
+
+        return pd.DataFrame(bags)
+
+    def create_bags(self, unique_syscalls: list):
+
+        bags = []
+        current_bag = None
+        for system_call in system_calls_iterator(self.input):
+            # For first syscall => create new bag and add syscall to it
+            if current_bag is None:
+                current_bag = {
+                    'label': 'N',
+                    'timestamp': system_call['timestamp']
+                }
+
+                # Fill bag
+                for unique_call in unique_syscalls:
+                    current_bag[unique_call] = 0
+                
+                # Add current syscall to new bag
+                system_call_name = system_call['name']
+                current_bag[system_call_name] = current_bag[system_call_name] + 1
+
+                # Set label
+                if system_call['label'] == 'A':
+                    current_bag['label'] = 'A'
+
+                continue
+
+            # For all but first bag            
+            if system_call['timestamp'] >= current_bag['timestamp'] + self.delta_t:
+                # If system_call belongs to the next bag
+                # Add current_bag to list of bags
+                bags.append(current_bag)
+
+                # Create new current_bag
+                current_bag = {
+                    'label': 'N',
+                    'timestamp': system_call['timestamp']
+                }
+
+                # Fill bag
+                for unique_call in unique_syscalls:
+                    current_bag[unique_call] = 0
+                
+                # Add current syscall to new bag
+                system_call_name = system_call['name']
+                current_bag[system_call_name] = current_bag[system_call_name] + 1
+                continue
+            else:
+                # If system_call belongs to current bag
+                system_call_name = system_call['name']
+                current_bag[system_call_name] = current_bag[system_call_name] + 1
+
+            # Set label
+            if system_call['label'] == 'A':
+                current_bag['label'] = 'A'
+
+        # Last bag was not added to list of bags, so add it here
+        bags.append(current_bag)
+
+        return bags
 
 
-    def create_frequency_vectors(self, system_calls: list) -> list:
+    def create_frequency_vectors_old(self, system_calls: list) -> list:
         frequency_vectors = []
 
         current_timestamp = None
@@ -74,7 +131,7 @@ class FrequencyVectorPreProcessor:
 
         return frequency_vectors
 
-    def create_bags(self, frequency_vectors: list, unique_calls: list) -> list:
+    def create_bags_old(self, frequency_vectors: list, unique_calls: list) -> list:
         bags = []
 
         for frequency_vector in frequency_vectors:
@@ -104,7 +161,7 @@ class FrequencyVectorPreProcessor:
     # Returns the static portion of the pre-processor id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'frequency_vector_{args.delta_t}'
+        return f'frequency_vector_{args.delta_t}_{args.drop_duplicates_mode}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
