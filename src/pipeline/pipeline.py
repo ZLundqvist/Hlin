@@ -7,7 +7,12 @@ from models.knn import KNNModel
 from models.isolation_forest import IsolationForestModel
 from util.args import pretty_print_args
 from util.filesystem import get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
-from util.data_transformers import frequency_vector_knn, frequency_vector_isolation_forest, sliding_window_knn, sliding_window_isolation_forest, n_gram_knn, n_gram_isolation_forest
+from util.data_transformers import n_gram_knn, n_gram_isolation_forest
+
+
+import data_transformers.knn as KNNTransformers
+import data_transformers.isolation_forest as IsolationForestTransformers
+
 
 class Pipeline:
     def __init__(self, args):
@@ -20,20 +25,20 @@ class Pipeline:
             self.pre_processor_class = FrequencyVectorPreProcessor
             
             if self.args.model == 'knn':
-                self.data_transformer = frequency_vector_knn
+                self.data_transformer = KNNTransformers.from_frequency_vector
                 self.model_class = KNNModel
             elif self.args.model == 'isolation_forest':
-                self.data_transformer = frequency_vector_isolation_forest
+                self.data_transformer = IsolationForestTransformers.from_frequency_vector
                 self.model_class = IsolationForestModel
 
         elif self.args.pre_processor == 'sliding_window':
             self.pre_processor_class = SlidingWindowPreProcessor
 
             if self.args.model == 'knn':
-                self.data_transformer = sliding_window_knn
+                self.data_transformer = KNNTransformers.from_sliding_window
                 self.model_class = KNNModel
             elif self.args.model == 'isolation_forest':
-                self.data_transformer = sliding_window_isolation_forest
+                self.data_transformer = IsolationForestTransformers.from_sliding_window
                 self.model_class = IsolationForestModel
 
         elif self.args.pre_processor == 'n_gram':
@@ -74,14 +79,14 @@ class Pipeline:
         df = pp.pre_process()
         print(f'[+] Pre-process: {round(time.time() - t0, 2)}s')
 
-        # print('\n------- Data Transformation -------')
-        # t0 = time.time()
-        # transformed_df = self.data_transformer(df)
-        # print(f'[+] Transform: {round(time.time() - t0, 2)}s')
+        print('\n------- Data Transformation -------')
+        t0 = time.time()
+        transformed_data_set = self.data_transformer(df)
+        print(f'[+] Transform: {round(time.time() - t0, 2)}s')
 
         print('\n------- Training/Validation -------')
         t0 = time.time()
-        model = self.model_class(args=self.args, input_file=input_file, data_set=df)
+        model = self.model_class(args=self.args, input_file=input_file, data_set=transformed_data_set)
         eval_result = model.train_validate()
         print(f'[+] Train/Validate: {round(time.time() - t0, 2)}s')
 
