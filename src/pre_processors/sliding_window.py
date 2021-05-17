@@ -43,7 +43,7 @@ class SlidingWindowPreProcessor:
 
         print(f'[+] Bags: {len(bags)}')
 
-        return pandas.DataFrame(bags)
+        return pd.DataFrame(bags)
 
     def create_bags(self, unique_syscalls: list):
         bags = []
