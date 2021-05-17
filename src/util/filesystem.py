@@ -1,5 +1,6 @@
 import os
 import json
+import pandas
 import csv
 
 cache_directory = os.path.join(os.path.dirname(__file__), '../../cache/')
@@ -69,5 +70,19 @@ def read_cache_json(id: str) -> list:
         data = json.load(f)
         assert type(data) == list
         return data
+    
+    return None
+
+def write_cache_pickle(id: str, df: pandas.DataFrame):
+    file = os.path.join(cache_directory, id)
+    df.to_pickle(path=file)
+    print(f'[+] DataFrame cached: {file}')
+
+def read_cache_pickle(id: str) -> pandas.DataFrame:
+    file = os.path.join(cache_directory, id)
+
+    if os.path.exists(file):
+        print(f'[+] Found cached DataFrame: {file}')
+        return pandas.read_pickle(file)
     
     return None

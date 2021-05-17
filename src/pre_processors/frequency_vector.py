@@ -1,8 +1,9 @@
 import argparse
 import os
+import pandas as pd
 
 from util.filesystem import ensure_file, write_cache_json, read_cache_json
-from util.pre_processing import read_log_file, get_unique_calls
+from util.pre_processing import read_log_file, get_unique_calls, get_calls_metadata
 
 class FrequencyVectorPreProcessor:
     def __init__(self, input_file: str, args):
@@ -35,6 +36,16 @@ class FrequencyVectorPreProcessor:
         write_cache_json(self.id, bags)
 
         return bags
+
+    def create_dataframe(self) -> pd.DataFrame:
+        num_calls, unique_calls = get_calls_metadata(self.input)
+
+        print(f'[+] System calls: {num_calls}')
+        print(f'[+] Unique calls: {len(unique_calls)}')
+
+
+        return None
+
 
     def create_frequency_vectors(self, system_calls: list) -> list:
         frequency_vectors = []

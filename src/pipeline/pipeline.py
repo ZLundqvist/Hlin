@@ -71,17 +71,17 @@ class Pipeline:
         print('\n---------- Pre-processing ----------')
         t0 = time.time()
         pp = self.pre_processor_class(args=self.args, input_file=input_file)
-        pp_data = pp.pre_process()
+        df = pp.pre_process()
         print(f'[+] Pre-process: {round(time.time() - t0, 2)}s')
 
-        print('\n------- Data Transformation -------')
-        t0 = time.time()
-        transformed_data = self.data_transformer(pp_data)
-        print(f'[+] Transform: {round(time.time() - t0, 2)}s')
+        # print('\n------- Data Transformation -------')
+        # t0 = time.time()
+        # transformed_df = self.data_transformer(df)
+        # print(f'[+] Transform: {round(time.time() - t0, 2)}s')
 
         print('\n------- Training/Validation -------')
         t0 = time.time()
-        model = self.model_class(args=self.args, input_file=input_file, data_set=transformed_data)
+        model = self.model_class(args=self.args, input_file=input_file, data_set=df)
         eval_result = model.train_validate()
         print(f'[+] Train/Validate: {round(time.time() - t0, 2)}s')
 

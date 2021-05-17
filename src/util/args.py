@@ -11,6 +11,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Hlin')
     parser.add_argument('-p', dest='pre_processor', required=True, choices=['frequency_vector', 'sliding_window', 'n_gram'])
     parser.add_argument('-m', dest='model', required=True, choices=['knn', 'isolation_forest'])
+    parser.add_argument('--dd', dest='drop_duplicates_mode', default='all', choices=['all', 'label', 'none'])
 
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument('-i', dest='input')
@@ -42,6 +43,6 @@ def pretty_print_args(args):
 
     print('------------ Settings ------------')
     for name, value in kwargs:
-        if value:
-            print(f'{(name + ":"):<{20}}{value}')
+        if value is not None:
+            print(f'{(name + ":"):<{22}}{value}')
 
