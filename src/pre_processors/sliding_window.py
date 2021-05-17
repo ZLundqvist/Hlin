@@ -1,6 +1,6 @@
 import argparse
 import os
-import pandas
+import pandas as pd
 
 from util.filesystem import ensure_file, write_cache_pickle, read_cache_pickle
 from util.pre_processing import get_calls_metadata, system_calls_iterator, drop_duplicates
@@ -13,6 +13,7 @@ class SlidingWindowPreProcessor:
         self.window_size = args.window_size
         self.window_step_size = args.window_step_size
         self.drop_duplicates_mode = args.drop_duplicates_mode
+
         self.id = f'{self.get_static_id(args)}_{self.input_filename}'
 
     def pre_process(self):
