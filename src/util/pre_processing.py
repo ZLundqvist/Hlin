@@ -1,5 +1,6 @@
 import time
 import pandas as pd
+from decimal import Decimal
 
 from .filesystem import resolve_abs_path
 
@@ -75,7 +76,7 @@ def line_to_system_call(line: str) -> dict:
 
     return {
         'label': parts[0],
-        'timestamp': float(parts[1]),
+        'timestamp': Decimal(parts[1]),
         'name': parts[2]
     }
 

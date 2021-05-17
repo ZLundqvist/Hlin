@@ -1,6 +1,7 @@
 import argparse
 import os
 import pandas as pd
+from decimal import Decimal
 
 from util.filesystem import ensure_file, read_cache_pickle, write_cache_pickle
 from util.pre_processing import get_calls_metadata, drop_duplicates, system_calls_iterator
@@ -9,7 +10,7 @@ class FrequencyVectorPreProcessor:
     def __init__(self, input_file: str, args):
         self.input = input_file
         self.input_filename = os.path.basename(self.input).split('.')[0] # Get file name without extension
-        self.delta_t = args.delta_t / 1000 # convert to ms
+        self.delta_t = Decimal(args.delta_t) / Decimal(1000) # convert to ms
         self.drop_duplicates_mode = args.drop_duplicates_mode
         
         self.id = f'{self.get_static_id(args)}_{self.input_filename}'
@@ -45,28 +46,33 @@ class FrequencyVectorPreProcessor:
 
     def create_bags(self, unique_syscalls: list):
 
+        def create_new_bag(first_system_call):
+            new_bag = {
+                'label': 'N',
+                'timestamp': first_system_call['timestamp']
+            }
+
+            # Fill bag
+            for unique_call in unique_syscalls:
+                new_bag[unique_call] = 0
+
+            # Add syscall to new bag
+            system_call_name = first_system_call['name']
+            new_bag[system_call_name] = new_bag[system_call_name] + 1
+
+            # Update label if needed
+            if first_system_call['label'] == 'A':
+                new_bag['label'] = 'A'
+
+            return new_bag
+
+
         bags = []
         current_bag = None
         for system_call in system_calls_iterator(self.input):
             # For first syscall => create new bag and add syscall to it
             if current_bag is None:
-                current_bag = {
-                    'label': 'N',
-                    'timestamp': system_call['timestamp']
-                }
-
-                # Fill bag
-                for unique_call in unique_syscalls:
-                    current_bag[unique_call] = 0
-                
-                # Add current syscall to new bag
-                system_call_name = system_call['name']
-                current_bag[system_call_name] = current_bag[system_call_name] + 1
-
-                # Set label
-                if system_call['label'] == 'A':
-                    current_bag['label'] = 'A'
-
+                current_bag = create_new_bag(system_call)
                 continue
 
             # For all but first bag            
@@ -76,85 +82,17 @@ class FrequencyVectorPreProcessor:
                 bags.append(current_bag)
 
                 # Create new current_bag
-                current_bag = {
-                    'label': 'N',
-                    'timestamp': system_call['timestamp']
-                }
-
-                # Fill bag
-                for unique_call in unique_syscalls:
-                    current_bag[unique_call] = 0
-                
-                # Add current syscall to new bag
-                system_call_name = system_call['name']
-                current_bag[system_call_name] = current_bag[system_call_name] + 1
-                continue
+                current_bag = create_new_bag(system_call)
             else:
                 # If system_call belongs to current bag
                 system_call_name = system_call['name']
                 current_bag[system_call_name] = current_bag[system_call_name] + 1
-
-            # Set label
-            if system_call['label'] == 'A':
-                current_bag['label'] = 'A'
+                # Set label
+                if system_call['label'] == 'A':
+                    current_bag['label'] = 'A'
 
         # Last bag was not added to list of bags, so add it here
         bags.append(current_bag)
-
-        return bags
-
-
-    def create_frequency_vectors_old(self, system_calls: list) -> list:
-        frequency_vectors = []
-
-        current_timestamp = None
-        for system_call in system_calls:
-            if current_timestamp is None:
-                frequency_vectors.append({
-                    'timestamp': system_call['timestamp'],
-                    'calls': [system_call]
-                })
-                current_timestamp = system_call['timestamp']
-                continue
-            
-            if system_call['timestamp'] >= current_timestamp + self.delta_t:
-                # If system_call belongs to the next timestamp
-                frequency_vectors.append({
-                    'timestamp': system_call['timestamp'],
-                    'calls': [system_call]
-                })
-                current_timestamp = system_call['timestamp']
-                continue
-            else:
-                # If system_call belongs to current_timestamp
-                frequency_vectors[-1]['calls'].append(system_call)
-
-        return frequency_vectors
-
-    def create_bags_old(self, frequency_vectors: list, unique_calls: list) -> list:
-        bags = []
-
-        for frequency_vector in frequency_vectors:
-            label = 'N'
-            bag = {}
-
-            for unique_call in unique_calls:
-                bag[unique_call] = 0
-
-            for system_call in frequency_vector['calls']:
-                # Mark bag as anomalous if any of its system calls is labeled anomalous
-                if system_call['label'] == 'A':
-                    label = 'A'
-
-                system_call_name = system_call['name']
-                bag[system_call_name] = bag[system_call_name] + 1
-
-
-            bags.append({
-                'label': label,
-                'timestamp': frequency_vector['timestamp'],
-                'bag': bag
-            })
 
         return bags
     
