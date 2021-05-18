@@ -4,7 +4,7 @@ import pandas as pd
 from decimal import Decimal
 
 from util.filesystem import ensure_file, read_cache_pickle, write_cache_pickle
-from util.pre_processing import get_calls_metadata, drop_duplicates, system_calls_iterator
+from util.pre_processing import get_system_calls_metadata, drop_duplicates, get_system_calls
 
 class FrequencyVectorPreProcessor:
     def __init__(self, input_file: str, args):
@@ -33,7 +33,7 @@ class FrequencyVectorPreProcessor:
         return df
 
     def create_dataframe(self) -> pd.DataFrame:
-        num_calls, unique_calls = get_calls_metadata(self.input)
+        num_calls, unique_calls = get_system_calls_metadata(self.input)
 
         print(f'[+] System calls: {num_calls}')
         print(f'[+] Unique calls: {len(unique_calls)}')
@@ -69,7 +69,7 @@ class FrequencyVectorPreProcessor:
 
         bags = []
         current_bag = None
-        for system_call in system_calls_iterator(self.input):
+        for system_call in get_system_calls(self.input):
             # For first syscall => create new bag and add syscall to it
             if current_bag is None:
                 current_bag = create_new_bag(system_call)

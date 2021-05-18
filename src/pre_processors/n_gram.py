@@ -3,7 +3,7 @@ import os
 import pandas
 import numpy as np
 from util.filesystem import ensure_file, write_cache_pickle, read_cache_pickle
-from util.pre_processing import get_calls_metadata, system_calls_iterator, drop_duplicates
+from util.pre_processing import get_system_calls, get_system_calls_metadata, drop_duplicates
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 
@@ -36,7 +36,7 @@ class NGramPreProcessor:
         return df
 
     def create_dataframe(self):
-        num_calls, unique_calls = get_calls_metadata(self.input)
+        num_calls, unique_calls = get_system_calls_metadata(self.input)
 
         print(f'[+] System calls: {num_calls}')
         print(f'[+] Unique calls: {len(unique_calls)}')
@@ -52,7 +52,7 @@ class NGramPreProcessor:
         counter = 0
         current_n_gram = None
         
-        for system_call in system_calls_iterator(self.input):
+        for system_call in get_system_calls(self.input):
 
             if counter == 0:
                 current_n_gram = {

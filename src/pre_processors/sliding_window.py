@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from util.filesystem import ensure_file, write_cache_pickle, read_cache_pickle
-from util.pre_processing import get_calls_metadata, system_calls_iterator, drop_duplicates
+from util.pre_processing import get_system_calls_metadata, get_system_calls, drop_duplicates
 
 class SlidingWindowPreProcessor:
     
@@ -34,7 +34,7 @@ class SlidingWindowPreProcessor:
         return df
 
     def create_dataframe(self):
-        num_calls, unique_calls = get_calls_metadata(self.input)
+        num_calls, unique_calls = get_system_calls_metadata(self.input)
 
         print(f'[+] System calls: {num_calls}')
         print(f'[+] Unique calls: {len(unique_calls)}')

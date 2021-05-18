@@ -9,8 +9,10 @@ from util.args import pretty_print_args
 from util.filesystem import get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
 from util.data_transformers import n_gram_knn, n_gram_isolation_forest
 
+from models.random_forest import RandomForestModel
 
 import data_transformers.knn as KNNTransformers
+import data_transformers.random_forest as RandomForestTransformers
 import data_transformers.isolation_forest as IsolationForestTransformers
 
 
@@ -30,6 +32,9 @@ class Pipeline:
             elif self.args.model == 'isolation_forest':
                 self.data_transformer = IsolationForestTransformers.from_frequency_vector
                 self.model_class = IsolationForestModel
+            elif self.args.model == 'random_forest':
+                self.data_transformer = RandomForestTransformers.from_frequency_vector
+                self.model_class = RandomForestModel
 
         elif self.args.pre_processor == 'sliding_window':
             self.pre_processor_class = SlidingWindowPreProcessor
@@ -40,6 +45,9 @@ class Pipeline:
             elif self.args.model == 'isolation_forest':
                 self.data_transformer = IsolationForestTransformers.from_sliding_window
                 self.model_class = IsolationForestModel
+            elif self.args.model == 'random_forest':
+                self.data_transformer = RandomForestTransformers.from_sliding_window
+                self.model_class = RandomForestModel
 
         elif self.args.pre_processor == 'n_gram':
             self.pre_processor_class = NGramPreProcessor

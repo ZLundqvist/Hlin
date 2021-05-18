@@ -41,30 +41,29 @@ def drop_duplicates(df: pd.DataFrame, mode: str):
     else:
         raise Exception(f'Invalido drop_duplicates mode: {mode}')
 
-def get_calls_metadata(file_path: str):
+def get_system_calls_metadata(file_path: str):
+    print(f'[+] Reading metadata: {file_path}')
+    t0 = time.time()
     unique_calls = []
     num_calls = 0
 
-    for system_call in system_calls_iterator(file_path=file_path):
+    for system_call in get_system_calls(file_path=file_path):
         num_calls = num_calls + 1
 
         if system_call['name'] not in unique_calls:
             unique_calls.append(system_call['name'])
 
-    return num_calls, unique_calls,
+    print(f'[+] Read complete: {round(time.time() - t0, 2)}s')
+    return num_calls, unique_calls
 
-def system_calls_iterator(file_path: str):
+def get_system_calls(file_path: str):
     file_path = resolve_abs_path(file_path)
-    print(f'[+] Reading logfile: {file_path}')
-    t0 = time.time()
 
     with open(file_path) as file:
         for line in file:
             system_call = line_to_system_call(line.rstrip())
             if system_call:
                 yield system_call
-
-    print(f'[+] Read complete: {round(time.time() - t0, 2)}s')
     
 def line_to_system_call(line: str) -> dict:
     parts = line.split(' ')
