@@ -13,8 +13,8 @@ class EvalResult:
     def calc(self):
         true_negatives, false_positives, false_negatives, true_positives = confusion_matrix(self.true_y, self.pred_y, labels=['N', 'A']).ravel()
 
-        true_positive_rate = true_positives / (true_positives + false_negatives)
-        false_positive_rate = false_positives / (false_positives + true_negatives)
+        true_positive_rate = true_positives / max((true_positives + false_negatives), 1)
+        false_positive_rate = false_positives / max((false_positives + true_negatives), 1)
 
         acc = accuracy_score(self.true_y, self.pred_y, normalize=True)
 
