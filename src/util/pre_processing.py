@@ -28,13 +28,15 @@ def drop_duplicates(df: pd.DataFrame, mode: str):
     if mode == 'none':
         return df, 0
     elif mode == 'label':
-        columns.remove('timestamp')
+        if 'timestamp' in columns:
+            columns.remove('timestamp')
         df.drop_duplicates(subset=columns, ignore_index=True, inplace=True)
         duplicates_dropped = original_len - len(df)
         return df, duplicates_dropped
     elif mode == 'first':
         columns.remove('label')
-        columns.remove('timestamp')
+        if 'timestamp' in columns:
+            columns.remove('timestamp')
         df.drop_duplicates(subset=columns, ignore_index=True, inplace=True)
         duplicates_dropped = original_len - len(df)
         return df, duplicates_dropped
@@ -64,7 +66,7 @@ def get_system_calls(file_path: str):
             system_call = line_to_system_call(line.rstrip())
             if system_call:
                 yield system_call
-    
+                
 def line_to_system_call(line: str) -> dict:
     parts = line.split(' ')
     assert len(parts) == 3
