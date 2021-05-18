@@ -12,8 +12,8 @@ class KNNModel:
         self.threshold = args.anomaly_threshold
         self.input_file = input_file
 
-        self.validation_df = data_set[['label', 'timestamp']]
-        self.df = data_set.drop(['label', 'timestamp'], axis=1)
+        self.validation_df = data_set[['label']]
+        self.df = data_set.drop(['label'], axis=1)
 
     def train_validate(self): 
         df = self.df

@@ -53,11 +53,14 @@ class Pipeline:
             self.pre_processor_class = NGramPreProcessor
 
             if self.args.model == 'knn':
-                self.data_transformer = n_gram_knn
+                self.data_transformer = KNNTransformers.from_n_gram
                 self.model_class = KNNModel
             elif self.args.model == 'isolation_forest':
-                self.data_transformer = n_gram_isolation_forest
+                self.data_transformer = RandomForestTransformers.from_n_gram
                 self.model_class = IsolationForestModel
+            elif self.args.model == 'random_forest':
+                self.data_transformer = RandomForestTransformers.from_n_gram
+                self.model_class = RandomForestModel
 
         # The run id is unique per combination of pp and model (including their args)
         self.run_id = f'{self.model_class.get_static_id(self.args)}_{self.pre_processor_class.get_static_id(self.args)}'
