@@ -49,7 +49,7 @@ class SlidingWindowPreProcessor:
         bags = []
         counter = 0
         current_bag = None
-        for system_call in system_calls_iterator(self.input):
+        for system_call in get_system_calls(self.input):
 
             if counter == 0:
                 current_bag = {
