@@ -29,7 +29,7 @@ class RandomForestModel:
         print(f'[+] DataFrame split (train_len={len(train_df)}, test_len={len(test_df)})')
 
     def train_validate(self): 
-        clf = RandomForestClassifier(n_estimators=self.n_estimators)
+        clf = RandomForestClassifier(n_estimators=self.n_estimators, n_jobs=-1)
 
         clf.fit(self.X_train, self.y_train)
 

@@ -56,7 +56,7 @@ class Pipeline:
                 self.data_transformer = KNNTransformers.from_n_gram
                 self.model_class = KNNModel
             elif self.args.model == 'isolation_forest':
-                self.data_transformer = RandomForestTransformers.from_n_gram
+                self.data_transformer = IsolationForestTransformers.from_n_gram
                 self.model_class = IsolationForestModel
             elif self.args.model == 'random_forest':
                 self.data_transformer = RandomForestTransformers.from_n_gram
@@ -77,7 +77,6 @@ class Pipeline:
             assert len(input_files) > 0, 'Directory is empty'
 
             for f in input_files:
-                input_file = resolve_abs_path(f)
                 result = self.execute_file_input(f)
                 results.append(result)
 
