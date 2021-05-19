@@ -33,7 +33,7 @@ class EvalResult:
         return self.calculated_results
     
     def pretty_print(self):
-        print(f'TPR: {round(self.calculated_results["tpr"] * 100, 3)}%')
-        print(f'FPR: {round(self.calculated_results["fpr"] * 100, 3)}%')
-        print(f'ACC: {round(self.calculated_results["acc"] * 100, 3)}%')
+        print(f'[+] TPR: {self.calculated_results["tpr"]}')
+        print(f'[+] FPR: {self.calculated_results["fpr"]}')
+        print(f'[+] ACC: {self.calculated_results["acc"]}')
 

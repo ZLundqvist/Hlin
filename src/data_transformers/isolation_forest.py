@@ -29,7 +29,7 @@ def from_sliding_window(df: pd.DataFrame):
     }
 
 def from_n_gram(df: pd.DataFrame):
-    print(f'[+] Transforming {len(df)} sliding window bags for Isolation Forest')
+    print(f'[+] Transforming {len(df)} n-Grams for Isolation Forest')
 
     # Isolation Forest expects a contamination values
     # "The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the scores of the samples."

@@ -17,17 +17,17 @@ class IsolationForestModel:
 
         df = data_set['df']
         self.df_norm = df[df['label'] == 'N']
-        self.validation_df = df[['label', 'timestamp']]
-        self.df = df.drop(['label', 'timestamp'], axis=1)
+        self.validation_df = df[['label']]
+        self.df = df.drop(['label'], axis=1)
 
     def train_validate(self): 
         df = self.df
         X = df.values
-        X_norm = self.df_norm.drop(['label', 'timestamp'], axis=1).values
+        X_norm = self.df_norm.drop(['label'], axis=1).values
         # if self.contamination < 0.05:
         #     self.contamination = 0.05
         # isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0).fit(X_norm)
-        isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0).fit(X_norm)
+        isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=-1).fit(X)
 
         outlier_pred = isolation_forest.predict(X)
 
