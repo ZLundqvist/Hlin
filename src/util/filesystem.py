@@ -35,6 +35,7 @@ def get_dir_files_abs(dir: str):
     abs_path = resolve_abs_path(dir)
     files = [f for f in os.listdir(abs_path) if os.path.isfile(os.path.join(abs_path, f))]
     abs_files = [os.path.join(abs_path, f) for f in files]
+    abs_files.sort()
     return abs_files
 
 def write_eval_results_to_csv(run_id: str, eval_results: list):
