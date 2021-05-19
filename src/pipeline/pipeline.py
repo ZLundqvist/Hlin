@@ -6,7 +6,7 @@ from pre_processors.n_gram import NGramPreProcessor
 from models.knn import KNNModel
 from models.isolation_forest import IsolationForestModel
 from util.args import pretty_print_args
-from util.filesystem import get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
+from util.filesystem import does_eval_results_file_exist, get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
 from util.data_transformers import n_gram_knn, n_gram_isolation_forest
 
 from models.random_forest import RandomForestModel
@@ -64,6 +64,10 @@ class Pipeline:
 
         # The run id is unique per combination of pp and model (including their args)
         self.run_id = f'{self.model_class.get_static_id(self.args)}_{self.pre_processor_class.get_static_id(self.args)}'
+
+        # Ensure output file with same run_id does not exist
+        assert not does_eval_results_file_exist(self.run_id)
+
 
     def execute(self):
         results = []

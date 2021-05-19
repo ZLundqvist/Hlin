@@ -30,6 +30,11 @@ def resolve_abs_path(file_path):
         cwd = os.getcwd()
         return os.path.abspath(os.path.join(cwd, file_path))
 
+def does_eval_results_file_exist(run_id: str):
+    ensure_output_dir()
+    output_filename = os.path.join(output_directory, run_id + '.csv')
+    return ensure_file(output_filename)
+
 # Gets the absolute path to every file in the passed directory
 def get_dir_files_abs(dir: str):
     abs_path = resolve_abs_path(dir)
