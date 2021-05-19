@@ -18,8 +18,8 @@ class RandomForestModel:
         self.prepare_data(data_set=data_set)
 
     def prepare_data(self, data_set: pd.DataFrame):
-        # train_df, test_df = train_test_split(data_set, train_size=0.80, random_state=0, stratify=data_set['label'].values) # Stratify data
-        train_df, test_df = train_test_split(data_set, train_size=0.80, random_state=0)
+        train_df, test_df = train_test_split(data_set, train_size=0.80, random_state=0, stratify=data_set['label'].values) # Stratify data
+        # train_df, test_df = train_test_split(data_set, train_size=0.80, random_state=0)
 
         self.X_train = train_df.drop(['label'], axis=1).values
         self.X_test = test_df.drop(['label'], axis=1).values
