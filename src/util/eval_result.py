@@ -1,5 +1,6 @@
 import csv
 from sklearn.metrics import confusion_matrix, accuracy_score
+import os
 
 from util.filesystem import ensure_output_dir
 
@@ -19,7 +20,7 @@ class EvalResult:
         acc = accuracy_score(self.true_y, self.pred_y, normalize=True)
 
         self.calculated_results = {
-            'input_file': self.input_file,
+            'input_file': os.path.basename(self.input_file).split('.')[0],
             'tn': true_negatives,
             'fp': false_positives,
             'fn': false_negatives,
