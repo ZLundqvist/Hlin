@@ -37,49 +37,39 @@ class NGramPreProcessor:
 
         return df
 
-    # Creates an empty pandas DataFrame which has been memory optimized
-    def create_empty_dataframe(self, unique_syscalls: list):
-        # Create dataframe with a column for each system call
-        # columns = unique_syscalls.copy()
-        df = pd.DataFrame()
-
-        # # Convert all columns to type int16
-        # df = df.astype('uint16')
-
-        # # Insert label column and convert it to categorical type
-        # df.insert(loc=0, column='label', value='N')
-        # df['label'] = df['label'].astype('category')
-
-        # ['N', 0, 1, 0, 0, 1, 0, 1, 0,]
-
-        return df
 
     def create_dataframe(self):
         num_calls, unique_calls = get_system_calls_metadata(self.input)
-        encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
-
+        
         X = []
         for i in range(self.ngram_size):
             X.append(unique_calls.copy())
         X = np.transpose(X)
-
-        encoder = encoder.fit(X)
+        encoder = OneHotEncoder(sparse=False, handle_unknown='ignore').fit(X)
         
         print(f'[+] System calls: {num_calls}')
         print(f'[+] Unique calls: {len(unique_calls)}')
 
-        # df = self.create_empty_dataframe(unique_syscalls=unique_calls)
         n_grams = []
         labels = []
+        dataframes = []
         system_call_history = []
+        current_syscall_number = 0
+
+        def flush_to_df():
+            if not len(n_grams) > 0:
+                return
+            encoded_n_grams = encoder.transform(n_grams)
+            dataframes.append(pd.DataFrame(encoded_n_grams, dtype='bool'))
+            n_grams.clear()
+
+            progress = round((current_syscall_number / num_calls) * 100, 3)
+            sys.stdout.write(f'\r[+] {progress}%')
+            sys.stdout.flush()
+            
 
         def create_new_n_gram():
             sequence = []
-
-            # new_n_gram = {
-            #     'label': 'N',
-            # }
-
             # Add history to new_n_gram
             labeltoset = 'N'
             for syscall in system_call_history:
@@ -92,19 +82,10 @@ class NGramPreProcessor:
             
             # Make sure sequence is of length=self.ngram_size
             while len(sequence) < self.ngram_size:
-                # print(len(sequence))
                 sequence.append(None)
-
-            # new_n_gram['seq'] = encoder.transform([sequence])
-
             n_grams.append(sequence)
 
-            # n_grams.append(encoder.transform([sequence1])[0])
-            # print(encoder.transform([sequence]))
-            #encoder.transform([sequence])
-            # return new_n_gram
-
-        current_syscall_number = 0
+        
         for system_call in get_system_calls(self.input):
             # Add syscall to start of list
             system_call_history.append(system_call)
@@ -117,60 +98,33 @@ class NGramPreProcessor:
                 # The history is large enough to create a new bag, nice!
                 create_new_n_gram()
 
-                # Remove <window_step_size> last items in history
+                #  Clear History
                 system_call_history =[]
                 history_has_new_syscalls = False
 
             
             FLUSH_AT = 100000
-            #Periodically flush bags to dataframe
-            # if len(n_grams) > FLUSH_AT: # arbitrary
-                # df = df.append(n_grams)
-                
-                # n_grams = []
-                # labels=[]
-            if current_syscall_number % 50000 == 0:
-
-                progress = round((current_syscall_number / num_calls) * 100, 5)
-                sys.stdout.write(f'\r[+] {progress}%')
-                sys.stdout.flush()
-
-        print('')
+            # Periodically flush ngrams to dataframe
+            if len(n_grams) > FLUSH_AT: # arbitrary
+                flush_to_df()
 
         # We might need to create one last bag if system calls were added after the last bag was created
         if history_has_new_syscalls:
             create_new_n_gram()
 
-        # first_ngram = n_grams[0]
-        # first_encoded_ngram= encoder.transform([first_ngram])
-        # df = pd.DataFrame(first_encoded_ngram, dtype='int8')
-        # print(df)
+        flush_to_df()
 
+        df_combined = pd.concat(dataframes)
+        assert len(df_combined) == len(labels)
+
+        # Add labels to df
+        df_combined['label'] = labels
+        df_combined['label'] = df_combined['label'].astype('category')
         
-        print(f'\n[+] One-Hot encoding...')
-        encoded_n_grams = encoder.transform(n_grams)
-        print(f'[+] Encoding done')
-
-        df2 = pd.DataFrame(encoded_n_grams, dtype='bool')
-
-        print(df2)
-        # df_final = pd.concat([df, df2], ignore_index=True, axis=0)
-
-        # print(df_final)
-
-        # df = df.append(encoded_n_grams)
-           
-
-
-        # df = pd.DataFrame()
-        # df = df.append(encoded_n_grams)
-        # df = df.astype('uint16') # Convert to uint datatype
-        df2['label'] = labels
-        print(df2)
         # # Check that we generated correct amount of bags
-        # expected_rows = math.ceil((num_calls / self.ngram_size))  # Number of rows expected is number of steps needed to be taken + 1 (because a bag is created before first step is taken)
-        # assert(len(df_final) == expected_rows)
-        return df2   
+        expected_rows = math.ceil((num_calls / self.ngram_size))  # Number of rows expected is number of steps needed to be taken + 1 (because a bag is created before first step is taken)
+        assert(len(df_combined) == expected_rows)
+        return df_combined
 
     @staticmethod
     def get_static_id(args):
