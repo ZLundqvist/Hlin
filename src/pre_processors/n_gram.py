@@ -99,7 +99,7 @@ class NGramPreProcessor:
                 create_new_n_gram()
 
                 #  Clear History
-                system_call_history =[]
+                system_call_history.clear()
                 history_has_new_syscalls = False
 
             
@@ -128,7 +128,7 @@ class NGramPreProcessor:
 
     @staticmethod
     def get_static_id(args):
-        return f'n_gram_{args.ngram_size}'
+        return f'n_gram_{args.ngram_size}_{args.drop_duplicates_mode}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
