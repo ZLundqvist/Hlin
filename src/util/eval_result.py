@@ -20,6 +20,7 @@ class EvalResult:
         acc = accuracy_score(self.true_y, self.pred_y, normalize=True)
 
         self.calculated_results = {
+            'run_id': None, # TB inserted
             'input_file': os.path.basename(self.input_file).split('.')[0],
             'tn': true_negatives,
             'fp': false_positives,
@@ -30,8 +31,11 @@ class EvalResult:
             'acc': acc
         }
 
-    def get_results(self) -> dict:
-        return self.calculated_results
+    def get_results(self, run_id: str) -> dict:
+        results_with_run_id = self.calculated_results.copy()
+        results_with_run_id['run_id'] = run_id
+
+        return results_with_run_id
     
     def pretty_print(self):
         print(f'[+] TPR: {self.calculated_results["tpr"]}')

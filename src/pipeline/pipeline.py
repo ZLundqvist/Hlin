@@ -66,7 +66,7 @@ class Pipeline:
         self.run_id = f'{self.model_class.get_static_id(self.args)}_{self.pre_processor_class.get_static_id(self.args)}'
 
         # Ensure output file with same run_id does not exist
-        assert not does_eval_results_file_exist(self.run_id)
+        assert not does_eval_results_file_exist(self.run_id), f'Evaluation results file already exists: {self.run_id}'
 
 
     def execute(self):

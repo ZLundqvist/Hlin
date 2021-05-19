@@ -47,7 +47,7 @@ def write_eval_results_to_csv(run_id: str, eval_results: list):
     ensure_output_dir()
     output_filename = os.path.join(output_directory, run_id + '.csv')
 
-    result_dicts = [eval_result.get_results() for eval_result in eval_results]
+    result_dicts = [eval_result.get_results(run_id) for eval_result in eval_results]
 
     keys = result_dicts[0].keys()
 
