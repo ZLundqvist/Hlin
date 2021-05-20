@@ -27,7 +27,7 @@ class IsolationForestModel:
         isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
         # isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=-1).fit(X)
 
-         y_pred = isolation_forest.predict(self.X)
+        y_pred = isolation_forest.predict(self.X)
 
         y_pred = np.where(y_pred == -1, 'A', 'N')   # Get predicted labels
 
