@@ -93,7 +93,8 @@ class Pipeline:
                 result = self.execute_file_input(f)
                 results.append(result)
 
-        write_eval_results_to_csv(run_id=self.run_id, eval_results=results)
+        if not self.args.skip_training:
+            write_eval_results_to_csv(run_id=self.run_id, eval_results=results)
 
     def execute_file_input(self, input_file):
         print('\n---------- Pre-processing ----------')
@@ -107,7 +108,12 @@ class Pipeline:
         transformed_data_set = self.data_transformer(df)
         print(f'[+] Transform: {round(time.time() - t0, 2)}s')
 
+
         print('\n------- Training/Validation -------')
+        if self.args.skip_training:
+            print('[+] Skipped')
+            return None
+
         t0 = time.time()
         model = self.model_class(args=self.args, input_file=input_file, data_set=transformed_data_set)
         eval_result = model.train_validate()
