@@ -131,7 +131,7 @@ class SlidingWindowPreProcessor:
     # Returns the static portion of the pre-processor id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'sliding_window_{args.window_size}_{args.window_step_size}_{args.drop_duplicates_mode}'
+        return f'sw_{args.window_size}_{args.window_step_size}_{args.drop_duplicates_mode}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):

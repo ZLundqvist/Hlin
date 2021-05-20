@@ -42,7 +42,7 @@ class RandomForestModel:
     # Returns the static portion of the model id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'random_forest_{args.n_estimators}'
+        return f'rForest_{args.n_estimators}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):

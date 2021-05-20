@@ -99,7 +99,7 @@ class FrequencyVectorPreProcessor:
     # Returns the static portion of the pre-processor id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'frequency_vector_{args.delta_t}_{args.drop_duplicates_mode}'
+        return f'fv_{args.delta_t}_{args.drop_duplicates_mode}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):

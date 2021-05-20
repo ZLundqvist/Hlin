@@ -8,7 +8,7 @@ from sklearn.ensemble import IsolationForest
 
 from util.eval_result import EvalResult
 
-# Unsupervised version of KNN
+
 class IsolationForestModel:
     def __init__(self, args, input_file: str, data_set):
         self.n_estimators = args.n_estimators
@@ -27,7 +27,7 @@ class IsolationForestModel:
         isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
         # isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=-1).fit(X)
 
-        y_pred = isolation_forest.predict(self.X)
+         y_pred = isolation_forest.predict(self.X)
 
         y_pred = np.where(y_pred == -1, 'A', 'N')   # Get predicted labels
 
@@ -38,7 +38,7 @@ class IsolationForestModel:
     # Returns the static portion of the model id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'isolation_forest_{args.n_estimators}'
+        return f'iForest_{args.n_estimators}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
