@@ -80,12 +80,12 @@ def read_cache_json(id: str) -> list:
     return None
 
 def write_cache_pickle(id: str, df: pandas.DataFrame):
-    file = os.path.join(cache_directory, id)
+    file = os.path.join(cache_directory, id + '.gz')
     df.to_pickle(path=file, compression='gzip')
     print(f'[+] DataFrame cached: {file}')
 
 def read_cache_pickle(id: str) -> pandas.DataFrame:
-    file = os.path.join(cache_directory, id)
+    file = os.path.join(cache_directory, id + '.gz')
 
     if os.path.exists(file):
         print(f'[+] Found cached DataFrame: {file}')
