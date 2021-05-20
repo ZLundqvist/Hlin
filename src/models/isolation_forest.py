@@ -16,25 +16,22 @@ class IsolationForestModel:
         self.input_file = input_file
 
         df = data_set['df']
-        self.df_norm = df[df['label'] == 'N']
-        self.validation_df = df[['label']]
-        self.df = df.drop(['label'], axis=1)
+        self.X = df.drop(['label'], axis=1).values
+        self.y = df['label'].values
 
     def train_validate(self): 
-        df = self.df
-        X = df.values
-        X_norm = self.df_norm.drop(['label'], axis=1).values
-        # if self.contamination < 0.05:
-        #     self.contamination = 0.05
-        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=-1).fit(X)
+        if self.contamination < 0.01:
+            self.contamination = 0.01
+        elif self.contamination > 0.05:
+            self.contamination = 0.05
+        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
         # isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=-1).fit(X)
 
-        outlier_pred = isolation_forest.predict(X)
+        y_pred = isolation_forest.predict(self.X)
 
-        outlier_true = self.validation_df['label'].values       # Get true (actual) labels
-        outlier_pred = np.where(outlier_pred == -1, 'A', 'N')   # Get predicted labels
+        y_pred = np.where(y_pred == -1, 'A', 'N')   # Get predicted labels
 
-        eval_results = EvalResult(input_file=self.input_file, true_y=outlier_true, pred_y=outlier_pred)
+        eval_results = EvalResult(input_file=self.input_file, true_y=self.y, pred_y=y_pred)
         eval_results.pretty_print()
         return eval_results
 
