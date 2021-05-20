@@ -14,18 +14,26 @@ class IsolationForestModel:
         self.n_estimators = args.n_estimators
         self.contamination = data_set['contamination']
         self.input_file = input_file
+        self.cont_mode = args.cont_mode
+        if self.cont_mode == 'custom':
+            self.c_floor = args.c_floor
+            self.c_ceiling = args.c_ceiling
 
         df = data_set['df']
         self.X = df.drop(['label'], axis=1).values
         self.y = df['label'].values
 
     def train_validate(self): 
-        if self.contamination < 0.01:
-            self.contamination = 0.01
-        elif self.contamination > 0.05:
-            self.contamination = 0.05
-        isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
-        # isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=-1).fit(X)
+        if self.cont_mode == 'custom':
+            self.contamination = max(min(self.contamination, self.c_ceiling), self.c_floor)
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
+
+        elif self.cont_mode == 'auto':
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=2).fit(self.X)
+
+        elif self.cont_mode == 'exact':
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
+
 
         y_pred = isolation_forest.predict(self.X)
 
@@ -38,8 +46,14 @@ class IsolationForestModel:
     # Returns the static portion of the model id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'iForest_{args.n_estimators}'
+        if args.cont_mode == 'custom':
+            return f'iForest_{args.n_estimators}_{args.cont_mode}_{args.c_floor}_{args.c_ceiling}'
+        else:
+            return f'iForest_{args.n_estimators}_{args.cont_mode}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
         argparser.add_argument('--n-estimators', dest='n_estimators', default=100, type=int)
+        argparser.add_argument('--c-mode', dest='cont_mode', default='exact', choices=['exact', 'auto', 'custom'])
+        argparser.add_argument('--cc-floor', dest='c_floor', default='0.01', type=float)
+        argparser.add_argument('--cc-ceil', dest='c_ceiling', default='0.05', type=float)
