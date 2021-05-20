@@ -5,6 +5,7 @@ from pre_processors.sliding_window import SlidingWindowPreProcessor
 from pre_processors.n_gram import NGramPreProcessor
 from models.knn import KNNModel
 from models.isolation_forest import IsolationForestModel
+from models.one_class_svm import OneClassSVMModel
 from util.args import pretty_print_args
 from util.filesystem import does_eval_results_file_exist, get_dir_files_abs, resolve_abs_path, write_eval_results_to_csv
 
@@ -13,7 +14,7 @@ from models.random_forest import RandomForestModel
 import data_transformers.knn as KNNTransformers
 import data_transformers.random_forest as RandomForestTransformers
 import data_transformers.isolation_forest as IsolationForestTransformers
-
+import data_transformers.one_class_svm as OneClassSVMTransformers
 
 class Pipeline:
     def __init__(self, args):
@@ -34,6 +35,9 @@ class Pipeline:
             elif self.args.model == 'random_forest':
                 self.data_transformer = RandomForestTransformers.from_frequency_vector
                 self.model_class = RandomForestModel
+            elif self.args.model == 'one_class_svm':
+                self.data_transformer = OneClassSVMTransformers.from_frequency_vector
+                self.model_class = OneClassSVMModel
 
         elif self.args.pre_processor == 'sliding_window':
             self.pre_processor_class = SlidingWindowPreProcessor
@@ -47,6 +51,9 @@ class Pipeline:
             elif self.args.model == 'random_forest':
                 self.data_transformer = RandomForestTransformers.from_sliding_window
                 self.model_class = RandomForestModel
+            elif self.args.model == 'one_class_svm':
+                self.data_transformer = OneClassSVMTransformers.from_sliding_window
+                self.model_class = OneClassSVMModel
 
         elif self.args.pre_processor == 'n_gram':
             self.pre_processor_class = NGramPreProcessor
@@ -60,6 +67,9 @@ class Pipeline:
             elif self.args.model == 'random_forest':
                 self.data_transformer = RandomForestTransformers.from_n_gram
                 self.model_class = RandomForestModel
+            elif self.args.model == 'one_class_svm':
+                self.data_transformer = OneClassSVMTransformers.from_n_gram
+                self.model_class = OneClassSVMModel
 
         # The run id is unique per combination of pp and model (including their args)
         self.run_id = f'{self.model_class.get_static_id(self.args)}_{self.pre_processor_class.get_static_id(self.args)}'
