@@ -15,7 +15,7 @@ class OneClassSVMModel:
         self.y = data_set['label'].values
 
     def train_validate(self): 
-        clf = OneClassSVM(kernel=self.kernel, gamma='auto').fit(self.X)
+        clf = OneClassSVM(kernel=self.kernel, gamma='auto', cache_size=10000).fit(self.X)
 
         y_pred = clf.predict(self.X)
 
@@ -28,7 +28,7 @@ class OneClassSVMModel:
     # Returns the static portion of the model id (filename not included)
     @staticmethod
     def get_static_id(args):
-        return f'one_class_svm_{args.kernel}'
+        return f'ocsvm_{args.kernel}'
 
     @staticmethod
     def append_args(argparser: argparse.ArgumentParser):
