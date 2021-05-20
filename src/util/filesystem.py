@@ -21,7 +21,7 @@ def ensure_output_dir():
 
 def ensure_file(file_path):
     path = resolve_abs_path(file_path)
-    return os.path.exists(file_path)
+    return os.path.exists(path)
 
 def resolve_abs_path(file_path):
     if os.path.isabs(file_path):
