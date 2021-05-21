@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.ensemble import IsolationForest
-
+import multiprocessing
+import math
 from util.eval_result import EvalResult
 
 
@@ -23,7 +24,20 @@ class IsolationForestModel:
         self.X = df.drop(['label'], axis=1).values
         self.y = df['label'].values
 
-    def train_validate(self): 
+        self.n_jobs = self.calculate_njobs(df=df)
+
+    def calculate_njobs(self, df):
+        cpus = multiprocessing.cpu_count()
+        million_rows = max(math.floor(len(df) / 10**6), 1)
+        cpus = max(math.floor(cpus / million_rows), 2)
+
+        print(f'[+] Using cores: {cpus}')
+
+        return cpus
+
+
+    def train_validate(self):
+
         if self.cont_mode == 'custom':
             self.contamination = max(min(self.contamination, self.c_ceiling), self.c_floor)
             isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
