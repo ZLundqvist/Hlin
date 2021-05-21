@@ -40,13 +40,13 @@ class IsolationForestModel:
 
         if self.cont_mode == 'custom':
             self.contamination = max(min(self.contamination, self.c_ceiling), self.c_floor)
-            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=self.n_jobs).fit(self.X)
 
         elif self.cont_mode == 'auto':
-            isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=2).fit(self.X)
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, random_state=0, n_jobs=self.n_jobs).fit(self.X)
 
         elif self.cont_mode == 'exact':
-            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=2).fit(self.X)
+            isolation_forest = IsolationForest(n_estimators=self.n_estimators, contamination=self.contamination, random_state=0, n_jobs=self.n_jobs).fit(self.X)
 
 
         y_pred = isolation_forest.predict(self.X)
