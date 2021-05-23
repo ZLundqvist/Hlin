@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import pandas as pd
-from scipy.sparse import data
 from sklearn.svm import OneClassSVM
 
 from util.eval_result import EvalResult
@@ -15,7 +14,7 @@ class OneClassSVMModel:
         self.y = data_set['label'].values
 
     def train_validate(self): 
-        clf = OneClassSVM(kernel=self.kernel, gamma='auto', cache_size=10000).fit(self.X)
+        clf = OneClassSVM(kernel=self.kernel, gamma='auto', cache_size=20000).fit(self.X)
 
         y_pred = clf.predict(self.X)
 

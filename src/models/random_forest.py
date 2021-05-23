@@ -1,9 +1,6 @@
 import argparse
 import numpy as np
 import pandas as pd
-from scipy.sparse import data
-from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 
 from sklearn.ensemble import RandomForestClassifier

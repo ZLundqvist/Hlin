@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import confusion_matrix, accuracy_score
 
 from util.eval_result import EvalResult
 
