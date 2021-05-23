@@ -81,35 +81,40 @@ class Pipeline:
     def execute(self):
         results = []
 
+        t0 = time.time()
+
         if self.args.input:
             input_file = resolve_abs_path(self.args.input)
-            result = self.execute_file_input(input_file)
+            result = self.execute_file_input(input_file, progress='[1/1]')
             results.append(result)
         elif self.args.input_dir:
             input_files = get_dir_files_abs(self.args.input_dir)
             assert len(input_files) > 0, 'Directory is empty'
 
-            for f in input_files:
-                result = self.execute_file_input(f)
+            for idx, file in enumerate(input_files):
+                result = self.execute_file_input(file, progress=f'[{idx}/{len(input_files)}]')
                 results.append(result)
+
 
         if not self.args.skip_training:
             write_eval_results_to_csv(run_id=self.run_id, eval_results=results)
 
-    def execute_file_input(self, input_file):
-        print('\n---------- Pre-processing ----------')
+        print(f'[+] Run complete: {round(time.time() - t0, 2)}s')
+
+    def execute_file_input(self, input_file, progress: str):
+        print(f'\n---------- Pre-processing {progress} ----------')
         t0 = time.time()
         pp = self.pre_processor_class(args=self.args, input_file=input_file)
         df = pp.pre_process()
         print(f'[+] Pre-process: {round(time.time() - t0, 2)}s')
 
-        print('\n------- Data Transformation -------')
+        print(f'\n------- Data Transformation {progress} -------')
         t0 = time.time()
         transformed_data_set = self.data_transformer(df)
         print(f'[+] Transform: {round(time.time() - t0, 2)}s')
 
 
-        print('\n------- Training/Validation -------')
+        print(f'\n------- Training/Validation {progress} -------')
         if self.args.skip_training:
             print('[+] Skipped')
             return None
