@@ -8,6 +8,8 @@ def from_frequency_vector(df: pd.DataFrame):
     # We actually know that as we have a labelled dataset, so calculate
     contamination = df['label'].value_counts(normalize=True)['A']
 
+    df = df.drop(['timestamp'], axis=1)
+
     print(f'[+] Contamination: {round(contamination* 100, 2)}%')
     return {
         'df': df,
