@@ -56,7 +56,6 @@ def split_column_iForest(row):
     return new_row
 
 def split_column_knn(row):
-    print(row)
     run_id: str = row.get('run_id')
         
     new_row = { 'run_id': run_id } 
@@ -109,7 +108,31 @@ def split_columns(file):
             new_rows.append(split_column_knn(row))
 
     with open('transformed_' + file, 'w', encoding='utf-8-sig') as csvfile:
-        all_keys = dict((k, None) for d in new_rows for k in d.keys()).keys()
+        all_keys = [
+            'run_id', 
+            'model',
+            'n_estimators',
+            'k-neighbours',
+            'threshold',
+            'preprocessor',
+            'delta_t',
+            'window_size',
+            'window_step_size',
+            'n_gram_size',
+            'cc_mode',
+            'cc_floor',
+            'cc_ceil',
+            'label',
+            'input_file',
+            'tn',
+            'fp',
+            'fn',
+            'tp',
+            'tpr',
+            'fpr',
+            'acc',
+            'detected'
+        ]
 
         writer = csv.DictWriter(csvfile, fieldnames=all_keys)
         writer.writeheader()
