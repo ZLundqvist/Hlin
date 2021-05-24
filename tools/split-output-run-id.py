@@ -109,6 +109,7 @@ def split_columns(file):
 
     with open('transformed_' + file, 'w', encoding='utf-8-sig') as csvfile:
         all_keys = [
+            'iteration',
             'run_id', 
             'model',
             'n_estimators',
