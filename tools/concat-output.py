@@ -11,7 +11,6 @@ def run(args):
     all_filenames = [i for i in glob.glob(f'{args.folder}/*.csv')]
 
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
-    combined_csv['iteration'] = args.iteration
 
     combined_csv.to_csv(output_file, index=False, encoding='utf-8-sig')
 
@@ -21,7 +20,6 @@ def run(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--folder', dest='folder', required=True)
-    parser.add_argument('--iteration', dest='iteration', required=True)
 
     args = parser.parse_args()
     run(args)
