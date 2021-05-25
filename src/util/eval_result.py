@@ -34,8 +34,12 @@ class EvalResult:
     def get_results(self, run_id: str) -> dict:
         results_with_run_id = self.calculated_results.copy()
         results_with_run_id['run_id'] = run_id
+        results_with_run_id['iteration'] = self.iteration
 
         return results_with_run_id
+
+    def set_iteration(self, iteration: int):
+        self.iteration = iteration
     
     def pretty_print(self):
         print(f'[+] TPR: {self.calculated_results["tpr"]}')

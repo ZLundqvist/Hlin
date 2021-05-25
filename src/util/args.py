@@ -14,6 +14,7 @@ def get_args():
     parser.add_argument('-m', dest='model', required=True, choices=['knn', 'isolation_forest', 'random_forest', 'one_class_svm'])
     parser.add_argument('--dd', dest='drop_duplicates_mode', default='none', choices=['first', 'label', 'none'])
     parser.add_argument('--skip-training', dest='skip_training', default=False, action='store_true')
+    parser.add_argument('--iteration', dest='iteration', type=int, required=True)
 
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument('-i', dest='input')

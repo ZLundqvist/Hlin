@@ -122,6 +122,7 @@ class Pipeline:
         t0 = time.time()
         model = self.model_class(args=self.args, input_file=input_file, data_set=transformed_data_set)
         eval_result = model.train_validate()
+        eval_result.set_iteration(self.args.iteration)
         print(f'[+] Train/Validate: {round(time.time() - t0, 2)}s')
 
         return eval_result
