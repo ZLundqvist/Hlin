@@ -13,7 +13,7 @@ iforest_param_values = {
 }
 
 sliding_window_param_values = {
-    'window_params': [(11, 11), (10, 5), (23, 12), (11, 6), (7, 4)] # (size, step_size)
+    'window_params': [(11, 11), (10, 5), (23, 12), (11, 6), (7, 4), (11, 5), (50, 26)] # (size, step_size)
 }
 
 frequency_vector_param_values = {
